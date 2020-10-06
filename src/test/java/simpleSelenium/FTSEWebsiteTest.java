@@ -2,6 +2,7 @@ package simpleSelenium;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
@@ -24,20 +25,33 @@ public static WebDriver driver;
 			"D:\\Nikolett\\QA\\Java\\Eclipse\\simpleSelenium\\src\\test\\resources\\drivers\\chromedriver.exe");
 		driver = new ChromeDriver();
 		driver.manage().window().setSize(new Dimension(1366, 768));
-	    driver.manage().timeouts().implicitlyWait(3000, TimeUnit.MILLISECONDS);
+	    driver.manage().timeouts().implicitlyWait(5000, TimeUnit.MILLISECONDS);
 	}
 	
 	@Test
-	public void loginTest() throws InterruptedException {
-		driver.get("http://thedemosite.co.uk/");
-	    WebElement login, username, password, send;
-	    login = driver.findElement(By.xpath(""));
-	    login.click();
-	    
-	    String registered = driver.findElement(By.xpath("/html/body/table/tbody/tr/td[1]/big/blockquote/blockquote/font/center/b")).getText();
-	    assertEquals("**Successful Login**",registered);
+  public void test() throws InterruptedException {
+      driver.get("https://www.hl.co.uk/shares/stock-market-summary/ftse-100");
+      double change = 0, riser = 0, faller = 0;
+      String riserName ="", fallerName = "", num;
 
-	}
+      List<WebElement> records = driver.findElements(By.cssSelector("tr[id^='ls-row-']"));
+      System.out.println("Array size = "+records.size());
+      for(WebElement record: records) {
+          num = record.findElement(By.cssSelector("tr td:nth-child(5)")).getText();
+          num = num.replace("%", "");
+          change = Double.parseDouble(num);
+          if (change > riser) {
+              riser = change;
+              riserName = record.findElement(By.cssSelector("tr td:nth-child(2)")).getText();
+          }else if(change < faller) {
+        	  faller = change;
+        	  fallerName = record.findElement(By.cssSelector("tr td:nth-child(2)")).getText();
+          }
+      }
+      
+      assertEquals("Rentokil Initial Plc",fallerName);
+      assertEquals("Rolls Royce Holdings Plc",riserName);
+  }
 	
 	
 	@AfterClass
